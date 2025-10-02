@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { v4 as uuid } from 'uuid';
-import { Button, Container, Input, ToDoList, ItemList } from './styles';
-import { FcOk, FcFullTrash } from "react-icons/fc";
+import { Button, Container, Input, ToDoList, ItemList, CheckOk, Trash } from './styles';
 
 function App() {
   const listInit = [
@@ -17,17 +16,21 @@ function App() {
     setInput(event.target.value)
   }
   function taskNova() {
-    setTaskList([...taskList, { id: uuid(), task: input, finished: false }])
+    if (input) {
+      setTaskList([...taskList, { id: uuid(), task: input, finished: false }])
+    }
   }
-  function taskFinished(id){
-    const newTaskList = taskList.map( item => {
-      item.id === id ? {...item, finished: true } : item;
-      console.log(item)
-    })
+  function taskFinished(id) {
+    const newTaskList = taskList.map(item => (
+      item.id === id ? { ...item, finished: !item.finished } : item
+    ))
     setTaskList(newTaskList);
-    //console.log(taskList)
   }
-  
+  function removeTask(id) {
+    const newTaskList = taskList.filter(item => item.id !== id)
+    setTaskList(newTaskList)
+  }
+
   return (
     <Container>
       <ToDoList>
@@ -36,14 +39,17 @@ function App() {
           <Button onClick={taskNova}>Adicionar</Button>
         </div>
         <ul>
-          {taskList.map(item => (
-            console.log(item.finished),
-            <ItemList $isfinished={item.finished} key={item.id}>
-              <FcOk size={20} onClick={() => taskFinished(item.id)}/>
-              <li>{item.task}</li>
-              <FcFullTrash size={20} />
-            </ItemList>
-          ))}
+          {taskList.length > 0 ? (
+            taskList.map(item => (
+              <ItemList $isfinished={item.finished} key={item.id}>
+                <CheckOk size={20} onClick={() => taskFinished(item.id)} />
+                <li>{item.task}</li>
+                <Trash size={20} onClick={() => removeTask(item.id)} />
+              </ItemList>
+            ))
+          ) : (
+            <div className='empty'>Não há tarefas cadastradas</div>
+          )}
         </ul>
       </ToDoList>
     </Container>
