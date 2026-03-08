@@ -1,35 +1,39 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { v4 as uuid } from 'uuid';
-import { Button, Container, Input, ToDoList, ItemList, CheckOk, Trash } from './styles';
+import { Button, Container, Input, ToDoList, ItemList, CheckOk, Trash, CheckFinished } from './styles';
+import api from './axios';
 
 function App() {
-  const listInit = [
-    { id: uuid(), task: "Levar totó no veterinário", finished: true },
-    { id: uuid(), task: "Comprar uma coquinha gelada", finished: false },
-    { id: uuid(), task: "Terminar ToDoList do DevClub", finished: false }]
-  //console.log(list)
-
   const [input, setInput] = useState()
-  const [taskList, setTaskList] = useState(listInit)
+  const [taskList, setTaskList] = useState([])
+
+  async function getAllTasks(){
+    const {data} = await api.get('/todos')
+    setTaskList(data);
+  }
 
   function inputNovo(event) {
     setInput(event.target.value)
   }
-  function taskNova() {
+  async function taskNova() {
     if (input) {
-      setTaskList([...taskList, { id: uuid(), task: input, finished: false }])
+      await api.post('/todos', {task: input})
+      setInput('')
+      getAllTasks()
     }
   }
-  function taskFinished(id) {
-    const newTaskList = taskList.map(item => (
-      item.id === id ? { ...item, finished: !item.finished } : item
-    ))
-    setTaskList(newTaskList);
+  async function taskFinished(id, finished) {
+    await api.patch(`/todos/${id}`, {finished: !finished})
+    getAllTasks()
   }
-  function removeTask(id) {
-    const newTaskList = taskList.filter(item => item.id !== id)
-    setTaskList(newTaskList)
+  async function removeTask(id) {
+    await api.delete(`/todos/${id}`)
+    getAllTasks()
   }
+
+  useEffect( () => {
+    getAllTasks()
+  }, [])
 
   return (
     <Container>
@@ -41,10 +45,13 @@ function App() {
         <ul>
           {taskList.length > 0 ? (
             taskList.map(item => (
-              <ItemList $isfinished={item.finished} key={item.id}>
-                <CheckOk size={20} onClick={() => taskFinished(item.id)} />
+              <ItemList $isfinished={item.finished} key={item._id}>
+                {item.finished 
+                  ? (<CheckFinished size={20} onClick={() => taskFinished(item._id, item.finished)} />) 
+                  : (<CheckOk size={20} onClick={() => taskFinished(item._id, item.finished)} />)
+                }
                 <li>{item.task}</li>
-                <Trash size={20} onClick={() => removeTask(item.id)} />
+                <Trash size={20} onClick={() => removeTask(item._id)} />
               </ItemList>
             ))
           ) : (

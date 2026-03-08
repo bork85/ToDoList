@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { FcOk, FcFullTrash } from "react-icons/fc";
+import { FcFullTrash, FcOk, FcQuestions } from "react-icons/fc";
 
 export const Container = styled.div`
     background: linear-gradient(90deg, #383838 0%, #000000 81.25%);
@@ -49,7 +49,7 @@ export const Input = styled.input`
 export const Button = styled.button`
     background-color: #8052EC;
     box-shadow: 4px 4px 10px rgba(0,0,0,0.3);
-    border-radius: 5px;
+    border-radius: 10px;
     font-weight: 900;
     font-size: 17px;
     line-height: 2px;
@@ -74,7 +74,7 @@ export const ItemList = styled.div`
     padding: 0 10px;
     height: 60px;
     border-radius: 5px;
-    background-color: ${props => props.$isfinished ? '#E8FF8B' : '#a1a1a1'};
+    background-color: ${props => props.$isfinished ? '#E8FF8B' : '#eeeeee'};
     margin-bottom: 20px;
     box-shadow: 4px 4px 10px rgba(0,0,0,0.2);
 
@@ -84,7 +84,12 @@ export const ItemList = styled.div`
     }
 `
 
-export const CheckOk = styled(FcOk)`
+export const CheckOk = styled(FcQuestions)`
+    &:hover {
+        cursor: pointer;
+    }
+`
+export const CheckFinished = styled(FcOk)`
     &:hover {
         cursor: pointer;
     }
